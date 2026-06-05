@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-label="Abstract study planning background">
+  <rect width="1200" height="700" fill="#20311f"/>
+  <g opacity="0.2" stroke="#ffffff" stroke-width="1">
+    <path d="M0 90H1200"/>
+    <path d="M0 180H1200"/>
+    <path d="M0 270H1200"/>
+    <path d="M0 360H1200"/>
+    <path d="M0 450H1200"/>
+    <path d="M0 540H1200"/>
+    <path d="M0 630H1200"/>
+    <path d="M120 0V700"/>
+    <path d="M240 0V700"/>
+    <path d="M360 0V700"/>
+    <path d="M480 0V700"/>
+    <path d="M600 0V700"/>
+    <path d="M720 0V700"/>
+    <path d="M840 0V700"/>
+    <path d="M960 0V700"/>
+    <path d="M1080 0V700"/>
+  </g>
+  <g opacity="0.72">
+    <circle cx="210" cy="210" r="76" fill="#dff0e4"/>
+    <rect x="818" y="118" width="240" height="138" rx="18" fill="#dcebf8"/>
+    <rect x="720" y="380" width="320" height="160" rx="20" fill="#f4ead1"/>
+    <path d="M95 560C180 474 275 474 360 560C445 646 540 646 625 560" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
+  </g>
+  <g fill="#20311f" opacity="0.56">
+    <rect x="850" y="148" width="180" height="18" rx="9"/>
+    <rect x="850" y="190" width="126" height="18" rx="9"/>
+    <rect x="760" y="420" width="220" height="18" rx="9"/>
+    <rect x="760" y="468" width="160" height="18" rx="9"/>
+  </g>
+</svg>
