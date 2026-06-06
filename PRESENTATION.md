@@ -1,29 +1,41 @@
-# StudySprint AI 展示稿
+# Study Sprint AI Presentation Script
 
-## 1. 项目介绍
+## 1. Project Introduction
 
-大家好，我的项目叫 StudySprint AI，是一个学习冲刺规划器。它面向考试周、作业截止前或者需要集中学习的学生，帮助用户把今天要做的任务整理成清楚的执行顺序。
+Hello, my project is called Study Sprint AI. It is a study planning web application for students who need to prepare for a quiz, assignment, presentation, or exam in a short period of time.
 
-## 2. 使用的 AI 工具
+The main idea is simple: the user enters a study topic, a goal, the number of days left, the preferred session length, and their current energy level. The app then creates a focused sprint plan that is easy to follow and easy to demonstrate.
 
-我使用了 OpenAI ChatGPT / Codex 辅助完成项目。AI 主要参与了项目构思、功能拆分、前端页面编写、交互逻辑调试和 README 整理。我也根据作业要求对功能范围、界面布局和演示流程进行了选择和修改。
+## 2. AI Tools Used
 
-## 3. 核心功能演示
+I used OpenAI ChatGPT / Codex during the Vibe Coding process. AI helped with project planning, interface structure, JavaScript logic, responsive CSS, README writing, and debugging.
 
-第一步，我点击右上角按钮载入演示数据。  
-第二步，我可以添加新的学习任务，设置预计时间、优先级和任务类型。  
-第三步，我切换当前精力状态，然后点击“生成今日冲刺顺序”，系统会推荐先做哪些任务。  
-第四步，我勾选完成任务，可以看到完成率、剩余时间和图表会自动变化。  
-第五步，我展示番茄钟，可以选择 15、25 或 45 分钟，并支持开始、暂停和重置。
+I did not only copy the first AI result. I adjusted the project scope for a student use case, tested the interaction flow, improved the layout, and added features that are useful for a live class demo.
 
-## 4. 遇到的问题和解决方法
+## 3. Main Feature Demo
 
-我一开始考虑做需要后端的服务，但课堂演示时网络或登录可能出问题。所以最终选择纯前端实现，用 LocalStorage 保存数据，这样打开网页就能运行。  
+First, I enter a course or topic, such as "English presentation practice."
 
-另一个问题是任务信息比较多，页面可能不清楚。我通过优先级标签、统计卡片和类型图表，让用户能快速看到当前学习状态。  
+Second, I write a clear learning goal and select the number of days left, the session length, and my energy level.
 
-手机端布局也需要优化，所以我使用响应式 CSS，在小屏幕下自动变成单列布局。
+Third, I click "Generate sprint plan." The app creates an AI-style learning strategy and five practical sprint tasks.
 
-## 5. GitHub 仓库介绍
+Fourth, I mark a task as complete. The completion percentage and progress chart update immediately.
 
-仓库中包含 `index.html`、`styles.css`、`app.js`、截图和 README。README 里写了项目介绍、主要功能、AI 工具、技术栈、运行方法和运行截图。项目至少有 3 次 commit 记录，符合提交要求。
+Fifth, I start the focus timer to show how the app supports a real study session.
+
+Finally, I write learning notes and refresh the page to show that notes are saved locally in the browser.
+
+## 4. Problems and Solutions
+
+One problem was reliability during classroom demonstration. A backend or external API could fail because of network or login issues, so I built the project as a pure front-end app that runs directly in the browser.
+
+Another problem was keeping the interface simple. Instead of adding too many features, I focused on the most useful workflow: plan, study, track progress, and reflect.
+
+The last problem was mobile usability. I used responsive CSS so the layout changes from a two-column workspace to a single-column layout on small screens.
+
+## 5. GitHub Repository
+
+The repository includes `index.html`, `styles.css`, `app.js`, screenshots, README documentation, and this presentation script.
+
+The README explains the project name, introduction, main features, AI tools used, tech stack, run method, screenshot, and demo steps. The repository also has more than three commit records, which satisfies the assignment requirement.
