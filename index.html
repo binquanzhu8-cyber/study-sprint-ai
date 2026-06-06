@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="cartoon-world" aria-hidden="true">
+      <span class="cloud cloud-one"></span>
+      <span class="cloud cloud-two"></span>
+      <span class="spark spark-one"></span>
+      <span class="spark spark-two"></span>
+      <span class="paper-plane"></span>
+      <span class="pencil-shape"></span>
+    </div>
+
     <main class="shell">
       <section class="workspace" aria-label="Study sprint workspace">
         <aside class="sidebar">
@@ -129,6 +138,22 @@
                 </div>
               </div>
               <div id="progressBars" class="progress-bars" aria-label="Progress by day"></div>
+            </section>
+
+            <section class="panel game-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Brain break</p>
+                  <h3>Concept Match</h3>
+                </div>
+                <button id="newGame" class="ghost-button" type="button">New game</button>
+              </div>
+              <div class="game-stats" aria-label="Game statistics">
+                <span><strong id="matchCount">0</strong>/4 pairs</span>
+                <span><strong id="moveCount">0</strong> moves</span>
+              </div>
+              <div id="gameBoard" class="game-board" aria-label="Concept matching card game"></div>
+              <p id="gameMessage" class="game-message" aria-live="polite">Find matching study concepts to recharge your focus.</p>
             </section>
           </div>
         </section>

@@ -18,8 +18,14 @@ const startTimerButton = document.querySelector("#startTimer");
 const pauseTimerButton = document.querySelector("#pauseTimer");
 const resetTimerButton = document.querySelector("#resetTimer");
 const timerFace = document.querySelector(".timer-face");
+const gameBoard = document.querySelector("#gameBoard");
+const newGameButton = document.querySelector("#newGame");
+const matchCount = document.querySelector("#matchCount");
+const moveCount = document.querySelector("#moveCount");
+const gameMessage = document.querySelector("#gameMessage");
 
 const STORAGE_KEY = "study-sprint-ai-state";
+const GAME_CONCEPTS = ["AI", "JS", "UX", "GIT"];
 
 const defaultState = {
   topic: "Calculus review",
@@ -38,6 +44,7 @@ let timer = {
   intervalId: null,
   running: false,
 };
+let game = createGame();
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -224,6 +231,96 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function createGame() {
+  const cards = shuffle([...GAME_CONCEPTS, ...GAME_CONCEPTS]).map((label, index) => ({
+    id: `${label}-${index}`,
+    label,
+    flipped: false,
+    matched: false,
+  }));
+
+  return {
+    cards,
+    flippedIndexes: [],
+    locked: false,
+    moves: 0,
+    matches: 0,
+  };
+}
+
+function shuffle(items) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const target = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[target]] = [shuffled[target], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function renderGame() {
+  gameBoard.innerHTML = "";
+  matchCount.textContent = game.matches;
+  moveCount.textContent = game.moves;
+
+  game.cards.forEach((card, index) => {
+    const button = document.createElement("button");
+    button.className = `match-card${card.flipped ? " flipped" : ""}${card.matched ? " matched" : ""}`;
+    button.type = "button";
+    button.textContent = card.flipped || card.matched ? card.label : "?";
+    button.setAttribute("aria-label", card.flipped || card.matched ? `${card.label} card` : "Hidden concept card");
+    button.disabled = card.matched || game.locked;
+    button.addEventListener("click", () => flipCard(index));
+    gameBoard.appendChild(button);
+  });
+}
+
+function flipCard(index) {
+  const card = game.cards[index];
+  if (game.locked || card.flipped || card.matched) return;
+
+  card.flipped = true;
+  game.flippedIndexes.push(index);
+  gameMessage.textContent = "Good pick. Find its matching concept.";
+  renderGame();
+
+  if (game.flippedIndexes.length === 2) {
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  const [firstIndex, secondIndex] = game.flippedIndexes;
+  const firstCard = game.cards[firstIndex];
+  const secondCard = game.cards[secondIndex];
+  game.moves += 1;
+
+  if (firstCard.label === secondCard.label) {
+    firstCard.matched = true;
+    secondCard.matched = true;
+    game.matches += 1;
+    game.flippedIndexes = [];
+    gameMessage.textContent =
+      game.matches === GAME_CONCEPTS.length
+        ? `You cleared the board in ${game.moves} moves. Back to the sprint.`
+        : "Nice match. Keep going.";
+    renderGame();
+    return;
+  }
+
+  game.locked = true;
+  gameMessage.textContent = "Not a pair yet. Try another memory path.";
+  renderGame();
+
+  window.setTimeout(() => {
+    firstCard.flipped = false;
+    secondCard.flipped = false;
+    game.flippedIndexes = [];
+    game.locked = false;
+    gameMessage.textContent = "Find matching study concepts to recharge your focus.";
+    renderGame();
+  }, 720);
+}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   state = {
@@ -253,5 +350,11 @@ notesInput.addEventListener("input", () => {
 startTimerButton.addEventListener("click", startTimer);
 pauseTimerButton.addEventListener("click", pauseTimer);
 resetTimerButton.addEventListener("click", resetTimer);
+newGameButton.addEventListener("click", () => {
+  game = createGame();
+  gameMessage.textContent = "New board ready. Find all four concept pairs.";
+  renderGame();
+});
 
 render();
+renderGame();

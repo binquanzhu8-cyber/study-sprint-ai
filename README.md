@@ -15,6 +15,8 @@ This project focuses on practical learning support rather than project size. It 
 - Focus timer for study sessions
 - Daily progress visualization
 - Auto-saved learning notes using browser local storage
+- Cartoon-style study background and playful visual design
+- Concept Match mini-game for a short brain break during study
 - Responsive layout for desktop and mobile screens
 
 ## AI Tools Used
@@ -54,7 +56,8 @@ http://localhost:8000
 4. Click **Generate sprint plan**.
 5. Mark tasks as complete and show the progress percentage.
 6. Start the focus timer.
-7. Write notes and refresh the page to show that notes are saved.
+7. Play the **Concept Match** mini-game by flipping cards and finding pairs.
+8. Write notes and refresh the page to show that notes are saved.
 
 ## Screenshot
 

@@ -4,7 +4,7 @@
 
 Hello, my project is called Study Sprint AI. It is a study planning web application for students who need to prepare for a quiz, assignment, presentation, or exam in a short period of time.
 
-The main idea is simple: the user enters a study topic, a goal, the number of days left, the preferred session length, and their current energy level. The app then creates a focused sprint plan that is easy to follow and easy to demonstrate.
+The main idea is simple: the user enters a study topic, a goal, the number of days left, the preferred session length, and their current energy level. The app then creates a focused sprint plan that is easy to follow and easy to demonstrate. I also redesigned the page with a cartoon-style study background and added a small Concept Match game as a study break feature.
 
 ## 2. AI Tools Used
 
@@ -24,6 +24,8 @@ Fourth, I mark a task as complete. The completion percentage and progress chart 
 
 Fifth, I start the focus timer to show how the app supports a real study session.
 
+Sixth, I play the Concept Match mini-game by flipping cards and finding matching study concepts.
+
 Finally, I write learning notes and refresh the page to show that notes are saved locally in the browser.
 
 ## 4. Problems and Solutions
@@ -31,6 +33,8 @@ Finally, I write learning notes and refresh the page to show that notes are save
 One problem was reliability during classroom demonstration. A backend or external API could fail because of network or login issues, so I built the project as a pure front-end app that runs directly in the browser.
 
 Another problem was keeping the interface simple. Instead of adding too many features, I focused on the most useful workflow: plan, study, track progress, and reflect.
+
+When adding the mini-game, I kept it small so it supports the study theme without distracting from the main planner.
 
 The last problem was mobile usability. I used responsive CSS so the layout changes from a two-column workspace to a single-column layout on small screens.
 
