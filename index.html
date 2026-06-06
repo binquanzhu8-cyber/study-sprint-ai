@@ -1,202 +1,139 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StudySprint AI | 学习冲刺规划器</title>
+    <title>Study Sprint AI</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar" aria-label="应用导航">
-        <div class="brand">
-          <div class="brand-mark">SS</div>
-          <div>
-            <p class="eyebrow">Vibe Coding Project</p>
-            <h1>StudySprint AI</h1>
-          </div>
-        </div>
-
-        <nav class="nav-list">
-          <a href="#planner" class="nav-link active">计划</a>
-          <a href="#timer" class="nav-link">专注</a>
-          <a href="#insights" class="nav-link">统计</a>
-          <a href="#demo" class="nav-link">演示</a>
-        </nav>
-
-        <div class="sidebar-note">
-          <span class="status-dot"></span>
-          <p>所有数据保存在浏览器本地，课堂演示不依赖服务器。</p>
-        </div>
-      </aside>
-
-      <main class="workspace">
-        <section class="topbar" aria-label="项目概览">
-          <div>
-            <p class="eyebrow">个人学习效率服务</p>
-            <h2>把今天的任务变成可执行的冲刺计划</h2>
-          </div>
-          <div class="topbar-actions">
-            <button class="icon-button" id="seedDemoButton" type="button" title="载入演示数据" aria-label="载入演示数据">
-              <span>↻</span>
-            </button>
-            <button class="primary-button" id="exportButton" type="button">导出计划</button>
-          </div>
-        </section>
-
-        <section class="hero-panel" id="demo">
-          <div class="hero-copy">
-            <p class="eyebrow">AI assisted planning</p>
-            <h2>输入任务、选择精力状态，系统会自动给出学习顺序和复习建议。</h2>
-            <p>
-              适合考试周、作业截止前、语言学习和编程练习。项目重点展示 AI 协作开发、可运行功能、响应式网页和用户体验优化。
-            </p>
-          </div>
-          <div class="hero-visual" aria-label="学习冲刺可视化">
-            <div class="orbit orbit-one"></div>
-            <div class="orbit orbit-two"></div>
-            <div class="focus-card mini-card">
-              <strong>90%</strong>
-              <span>今日完成率目标</span>
-            </div>
-            <div class="pulse-card mini-card">
-              <strong>25:00</strong>
-              <span>当前专注轮次</span>
-            </div>
-            <div class="wave-bars" aria-hidden="true">
-              <span style="--h: 44%"></span>
-              <span style="--h: 72%"></span>
-              <span style="--h: 58%"></span>
-              <span style="--h: 86%"></span>
-              <span style="--h: 64%"></span>
+    <main class="shell">
+      <section class="workspace" aria-label="Study sprint workspace">
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">SS</div>
+            <div>
+              <p class="eyebrow">Vibe Coding Project</p>
+              <h1>Study Sprint AI</h1>
             </div>
           </div>
-        </section>
 
-        <section class="grid-layout">
-          <div class="panel task-panel" id="planner">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">Planner</p>
-                <h3>任务规划</h3>
-              </div>
-              <span class="counter" id="taskCounter">0 项</span>
-            </div>
+          <form id="plannerForm" class="planner-form">
+            <label>
+              Course or topic
+              <input id="topic" type="text" value="Calculus review" maxlength="60" required />
+            </label>
 
-            <form class="task-form" id="taskForm">
+            <label>
+              Goal
+              <textarea id="goal" rows="4" maxlength="180" required>Prepare for a quiz by reviewing limits, derivatives, and common problem patterns.</textarea>
+            </label>
+
+            <div class="field-grid">
               <label>
-                <span>任务名称</span>
-                <input id="taskTitle" type="text" placeholder="例如：完成 README、复习 Python" required />
+                Days left
+                <input id="daysLeft" type="number" min="1" max="30" value="3" required />
               </label>
-              <div class="form-row">
-                <label>
-                  <span>预计时间</span>
-                  <input id="taskMinutes" type="number" min="5" max="240" step="5" value="30" required />
-                </label>
-                <label>
-                  <span>优先级</span>
-                  <select id="taskPriority">
-                    <option value="high">高</option>
-                    <option value="medium" selected>中</option>
-                    <option value="low">低</option>
-                  </select>
-                </label>
-              </div>
               <label>
-                <span>任务类型</span>
-                <select id="taskType">
-                  <option value="coding">编程</option>
-                  <option value="reading">阅读</option>
-                  <option value="memory">背诵</option>
-                  <option value="writing">写作</option>
-                  <option value="review">复习</option>
-                </select>
+                Minutes/session
+                <input id="sessionLength" type="number" min="15" max="120" step="5" value="35" required />
               </label>
-              <button class="primary-button full-width" type="submit">添加任务</button>
-            </form>
-
-            <div class="task-list" id="taskList" aria-live="polite"></div>
-          </div>
-
-          <div class="panel" id="timer">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">Focus Timer</p>
-                <h3>番茄专注</h3>
-              </div>
-              <span class="counter" id="sessionCounter">0 轮</span>
             </div>
 
-            <div class="timer-display" aria-live="polite">
-              <svg viewBox="0 0 120 120" role="img" aria-label="专注进度">
-                <circle class="timer-track" cx="60" cy="60" r="52"></circle>
-                <circle class="timer-progress" id="timerProgress" cx="60" cy="60" r="52"></circle>
-              </svg>
-              <div class="timer-time" id="timerTime">25:00</div>
-            </div>
-
-            <div class="timer-controls">
-              <button class="primary-button" id="startTimer" type="button">开始</button>
-              <button class="ghost-button" id="pauseTimer" type="button">暂停</button>
-              <button class="ghost-button" id="resetTimer" type="button">重置</button>
-            </div>
-
-            <div class="timer-presets" role="group" aria-label="时间预设">
-              <button type="button" data-minutes="15">15 分钟</button>
-              <button type="button" data-minutes="25" class="selected">25 分钟</button>
-              <button type="button" data-minutes="45">45 分钟</button>
-            </div>
-          </div>
-
-          <div class="panel ai-panel">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">AI Coach</p>
-                <h3>智能建议</h3>
-              </div>
-              <select id="energyLevel" aria-label="选择当前精力">
-                <option value="high">精力高</option>
-                <option value="medium" selected>精力一般</option>
-                <option value="low">精力低</option>
+            <label>
+              Energy level
+              <select id="energy">
+                <option value="balanced">Balanced</option>
+                <option value="tired">Tired</option>
+                <option value="focused">Focused</option>
               </select>
+            </label>
+
+            <button class="primary-action" type="submit">Generate sprint plan</button>
+          </form>
+        </aside>
+
+        <section class="main-panel">
+          <div class="topbar">
+            <div>
+              <p class="eyebrow">Today&apos;s focus</p>
+              <h2 id="planTitle">Calculus review sprint</h2>
             </div>
-            <div class="coach-card" id="coachCard">
-              <h4>先添加几个任务</h4>
-              <p>系统会根据任务优先级、预计时间和当前精力状态生成建议。</p>
+            <div class="score-card" aria-label="Completion score">
+              <span id="completionScore">0%</span>
+              <small>complete</small>
             </div>
-            <button class="ghost-button full-width" id="generatePlan" type="button">生成今日冲刺顺序</button>
-            <ol class="plan-list" id="planList"></ol>
           </div>
 
-          <div class="panel" id="insights">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">Insights</p>
-                <h3>学习统计</h3>
-              </div>
-              <button class="ghost-button small" id="clearDoneButton" type="button">清理已完成</button>
+          <section class="insight-band" aria-label="Generated study strategy">
+            <div class="orbital-map" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <strong id="focusInitial">C</strong>
             </div>
-            <div class="metric-grid">
-              <div class="metric">
-                <span>完成率</span>
-                <strong id="completionRate">0%</strong>
-              </div>
-              <div class="metric">
-                <span>剩余时间</span>
-                <strong id="remainingMinutes">0m</strong>
-              </div>
-              <div class="metric">
-                <span>高优先级</span>
-                <strong id="highPriorityCount">0</strong>
-              </div>
+            <div>
+              <p class="eyebrow">AI-generated strategy</p>
+              <p id="strategyText">
+                Start with a short diagnostic, study the weakest concept first, then finish with mixed practice.
+              </p>
             </div>
-            <div class="chart" id="typeChart" aria-label="任务类型统计"></div>
+          </section>
+
+          <div class="content-grid">
+            <section class="panel task-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Sprint tasks</p>
+                  <h3>Plan</h3>
+                </div>
+                <button id="resetTasks" class="ghost-button" type="button">Reset</button>
+              </div>
+              <ul id="taskList" class="task-list"></ul>
+            </section>
+
+            <section class="panel timer-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Focus timer</p>
+                  <h3>Session</h3>
+                </div>
+                <span id="timerMode" class="status-pill">Ready</span>
+              </div>
+              <div class="timer-face" aria-live="polite">
+                <span id="timerDisplay">35:00</span>
+              </div>
+              <div class="timer-controls">
+                <button id="startTimer" class="primary-action" type="button">Start</button>
+                <button id="pauseTimer" class="ghost-button" type="button">Pause</button>
+                <button id="resetTimer" class="ghost-button" type="button">Reset</button>
+              </div>
+            </section>
+
+            <section class="panel notes-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Reflection</p>
+                  <h3>Learning notes</h3>
+                </div>
+                <span class="status-pill">Auto-saved</span>
+              </div>
+              <textarea id="notes" rows="8" placeholder="Write what you learned, where you got stuck, and what to ask next."></textarea>
+            </section>
+
+            <section class="panel progress-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Progress</p>
+                  <h3>Daily rhythm</h3>
+                </div>
+              </div>
+              <div id="progressBars" class="progress-bars" aria-label="Progress by day"></div>
+            </section>
           </div>
         </section>
-      </main>
-    </div>
-
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </section>
+    </main>
 
     <script src="app.js"></script>
   </body>
