@@ -1,71 +1,59 @@
+const form = document.querySelector("#plannerForm");
+const topicInput = document.querySelector("#topic");
+const goalInput = document.querySelector("#goal");
+const daysInput = document.querySelector("#daysLeft");
+const sessionInput = document.querySelector("#sessionLength");
+const energyInput = document.querySelector("#energy");
+const planTitle = document.querySelector("#planTitle");
+const strategyText = document.querySelector("#strategyText");
+const taskList = document.querySelector("#taskList");
+const completionScore = document.querySelector("#completionScore");
+const progressBars = document.querySelector("#progressBars");
+const focusInitial = document.querySelector("#focusInitial");
+const resetTasksButton = document.querySelector("#resetTasks");
+const notesInput = document.querySelector("#notes");
+const timerDisplay = document.querySelector("#timerDisplay");
+const timerMode = document.querySelector("#timerMode");
+const startTimerButton = document.querySelector("#startTimer");
+const pauseTimerButton = document.querySelector("#pauseTimer");
+const resetTimerButton = document.querySelector("#resetTimer");
+const timerFace = document.querySelector(".timer-face");
+
 const STORAGE_KEY = "study-sprint-ai-state";
 
-const taskForm = document.querySelector("#taskForm");
-const taskList = document.querySelector("#taskList");
-const taskCounter = document.querySelector("#taskCounter");
-const taskTitle = document.querySelector("#taskTitle");
-const taskMinutes = document.querySelector("#taskMinutes");
-const taskPriority = document.querySelector("#taskPriority");
-const taskType = document.querySelector("#taskType");
-const coachCard = document.querySelector("#coachCard");
-const energyLevel = document.querySelector("#energyLevel");
-const planList = document.querySelector("#planList");
-const completionRate = document.querySelector("#completionRate");
-const remainingMinutes = document.querySelector("#remainingMinutes");
-const highPriorityCount = document.querySelector("#highPriorityCount");
-const typeChart = document.querySelector("#typeChart");
-const exportButton = document.querySelector("#exportButton");
-const seedDemoButton = document.querySelector("#seedDemoButton");
-const clearDoneButton = document.querySelector("#clearDoneButton");
-const generatePlan = document.querySelector("#generatePlan");
-const toast = document.querySelector("#toast");
-
-const timerTime = document.querySelector("#timerTime");
-const timerProgress = document.querySelector("#timerProgress");
-const startTimer = document.querySelector("#startTimer");
-const pauseTimer = document.querySelector("#pauseTimer");
-const resetTimer = document.querySelector("#resetTimer");
-const sessionCounter = document.querySelector("#sessionCounter");
-const presetButtons = document.querySelectorAll(".timer-presets button");
-
-const typeLabels = {
-  coding: "编程",
-  reading: "阅读",
-  memory: "背诵",
-  writing: "写作",
-  review: "复习",
-};
-
-const priorityLabels = {
-  high: "高优先级",
-  medium: "中优先级",
-  low: "低优先级",
-};
-
-const priorityScore = {
-  high: 3,
-  medium: 2,
-  low: 1,
+const defaultState = {
+  topic: "Calculus review",
+  goal: "Prepare for a quiz by reviewing limits, derivatives, and common problem patterns.",
+  daysLeft: 3,
+  sessionLength: 35,
+  energy: "balanced",
+  notes: "",
+  tasks: [],
 };
 
 let state = loadState();
 let timer = {
-  duration: 25 * 60,
-  remaining: 25 * 60,
-  running: false,
+  total: state.sessionLength * 60,
+  remaining: state.sessionLength * 60,
   intervalId: null,
+  running: false,
 };
 
 function loadState() {
-  const fallback = {
-    tasks: [],
-    sessions: 0,
-  };
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) {
+    return { ...defaultState, tasks: generateTasks(defaultState) };
+  }
 
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || fallback;
+    const parsed = JSON.parse(saved);
+    const merged = { ...defaultState, ...parsed };
+    return {
+      ...merged,
+      tasks: Array.isArray(merged.tasks) && merged.tasks.length ? merged.tasks : generateTasks(merged),
+    };
   } catch {
-    return fallback;
+    return { ...defaultState, tasks: generateTasks(defaultState) };
   }
 }
 
@@ -73,172 +61,158 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function createTask({ title, minutes, priority, type, done = false }) {
-  return {
-    id: crypto.randomUUID(),
-    title,
-    minutes: Number(minutes),
-    priority,
-    type,
-    done,
-    createdAt: new Date().toISOString(),
+function generateTasks(input) {
+  const minutes = Number(input.sessionLength);
+  const days = Number(input.daysLeft);
+  const topic = input.topic.trim() || "the topic";
+  const intensity =
+    input.energy === "tired"
+      ? "light recovery"
+      : input.energy === "focused"
+        ? "deep work"
+        : "steady practice";
+
+  return [
+    {
+      title: `Map the exam scope for ${topic}`,
+      detail: `Spend ${Math.max(10, Math.round(minutes * 0.35))} minutes turning the goal into a checklist.`,
+      chip: "Diagnose",
+      done: false,
+    },
+    {
+      title: "Study the weakest concept first",
+      detail: `Use one ${intensity} session before doing mixed questions.`,
+      chip: "Focus",
+      done: false,
+    },
+    {
+      title: "Complete active recall practice",
+      detail: "Answer questions without notes, then correct mistakes immediately.",
+      chip: "Recall",
+      done: false,
+    },
+    {
+      title: `Build a ${days}-day review rhythm`,
+      detail: "End each day by choosing the next smallest useful task.",
+      chip: "Schedule",
+      done: false,
+    },
+    {
+      title: "Write a final explanation in your own words",
+      detail: "This becomes your demo evidence and review summary.",
+      chip: "Reflect",
+      done: false,
+    },
+  ];
+}
+
+function createStrategy(input) {
+  const goal = input.goal.trim();
+  const energyAdvice = {
+    tired: "Keep the plan lighter: shorter drills, more examples, and a quick win at the start.",
+    balanced: "Use a balanced loop: diagnose, learn, practice, and reflect after each session.",
+    focused: "Use deeper sessions: solve harder problems first and reserve the end for error analysis.",
   };
+
+  return `${energyAdvice[input.energy]} Your goal is: ${goal} With ${input.daysLeft} day(s) left, the best path is to protect attention, practice actively, and finish with a visible summary of what improved.`;
 }
 
 function render() {
-  renderTasks();
-  renderInsights();
-  renderCoach();
-  saveState();
-}
+  topicInput.value = state.topic;
+  goalInput.value = state.goal;
+  daysInput.value = state.daysLeft;
+  sessionInput.value = state.sessionLength;
+  energyInput.value = state.energy;
+  notesInput.value = state.notes;
 
-function renderTasks() {
-  taskCounter.textContent = `${state.tasks.length} 项`;
+  planTitle.textContent = `${state.topic || "Study"} sprint`;
+  strategyText.textContent = createStrategy(state);
+  focusInitial.textContent = (state.topic || "S").trim().charAt(0).toUpperCase();
+
   taskList.innerHTML = "";
-
-  if (state.tasks.length === 0) {
-    taskList.innerHTML = `<div class="task-item"><div class="task-main"><p class="task-title">还没有任务</p><div class="task-meta">添加一个任务开始规划今天。</div></div></div>`;
-    return;
-  }
-
-  const sortedTasks = [...state.tasks].sort((a, b) => {
-    if (a.done !== b.done) return Number(a.done) - Number(b.done);
-    return priorityScore[b.priority] - priorityScore[a.priority] || a.minutes - b.minutes;
-  });
-
-  sortedTasks.forEach((task) => {
-    const item = document.createElement("article");
-    item.className = `task-item ${task.done ? "done" : ""}`;
+  state.tasks.forEach((task, index) => {
+    const item = document.createElement("li");
+    item.className = `task-item${task.done ? " done" : ""}`;
     item.innerHTML = `
-      <input class="task-check" type="checkbox" ${task.done ? "checked" : ""} aria-label="标记 ${escapeHtml(task.title)} 为完成" />
-      <div class="task-main">
-        <p class="task-title">${escapeHtml(task.title)}</p>
-        <div class="task-meta">
-          <span class="pill ${task.priority}">${priorityLabels[task.priority]}</span>
-          <span>${typeLabels[task.type]}</span>
-          <span>${task.minutes} 分钟</span>
-        </div>
-      </div>
-      <button class="delete-button" type="button" aria-label="删除任务">×</button>
+      <input type="checkbox" aria-label="Mark ${task.title} complete" ${task.done ? "checked" : ""} />
+      <span class="task-text">
+        <strong>${escapeHtml(task.title)}</strong>
+        <small>${escapeHtml(task.detail)}</small>
+      </span>
+      <span class="task-chip">${escapeHtml(task.chip)}</span>
     `;
-
-    item.querySelector(".task-check").addEventListener("change", () => toggleTask(task.id));
-    item.querySelector(".delete-button").addEventListener("click", () => deleteTask(task.id));
-    taskList.append(item);
-  });
-}
-
-function renderInsights() {
-  const total = state.tasks.length;
-  const done = state.tasks.filter((task) => task.done).length;
-  const remaining = state.tasks
-    .filter((task) => !task.done)
-    .reduce((sum, task) => sum + task.minutes, 0);
-  const highCount = state.tasks.filter((task) => task.priority === "high" && !task.done).length;
-
-  completionRate.textContent = total ? `${Math.round((done / total) * 100)}%` : "0%";
-  remainingMinutes.textContent = `${remaining}m`;
-  highPriorityCount.textContent = highCount;
-  sessionCounter.textContent = `${state.sessions} 轮`;
-
-  const counts = Object.keys(typeLabels).map((type) => ({
-    type,
-    label: typeLabels[type],
-    count: state.tasks.filter((task) => task.type === type).length,
-  }));
-  const max = Math.max(...counts.map((item) => item.count), 1);
-
-  typeChart.innerHTML = counts
-    .map(
-      (item) => `
-        <div class="chart-row">
-          <span>${item.label}</span>
-          <div class="chart-bar"><span style="width: ${(item.count / max) * 100}%"></span></div>
-          <span>${item.count}</span>
-        </div>
-      `,
-    )
-    .join("");
-}
-
-function renderCoach() {
-  const activeTasks = state.tasks.filter((task) => !task.done);
-
-  if (!activeTasks.length) {
-    coachCard.innerHTML = `<h4>先添加几个任务</h4><p>系统会根据任务优先级、预计时间和当前精力状态生成建议。</p>`;
-    planList.innerHTML = "";
-    return;
-  }
-
-  const totalMinutes = activeTasks.reduce((sum, task) => sum + task.minutes, 0);
-  const highTasks = activeTasks.filter((task) => task.priority === "high");
-  const energy = energyLevel.value;
-  const leadTask = recommendOrder(activeTasks, energy)[0];
-  const message = buildCoachMessage({ totalMinutes, highTasks, leadTask, energy });
-
-  coachCard.innerHTML = `
-    <h4>${escapeHtml(message.title)}</h4>
-    <p>${escapeHtml(message.body)}</p>
-  `;
-}
-
-function buildCoachMessage({ totalMinutes, highTasks, leadTask, energy }) {
-  if (energy === "low") {
-    return {
-      title: "建议从轻量任务热身",
-      body: `今天剩余 ${totalMinutes} 分钟。先做“${leadTask.title}”，再把高优先级任务拆成 15 分钟小段。`,
-    };
-  }
-
-  if (energy === "high" && highTasks.length) {
-    return {
-      title: "适合先攻克关键任务",
-      body: `当前有 ${highTasks.length} 个高优先级任务。建议先完成“${leadTask.title}”，保持连续专注。`,
-    };
-  }
-
-  return {
-    title: "保持稳定节奏",
-    body: `剩余任务约 ${totalMinutes} 分钟。按优先级排序，并在每 25 分钟后休息 5 分钟。`,
-  };
-}
-
-function recommendOrder(tasks, energy) {
-  const sorted = [...tasks].sort((a, b) => {
-    const priorityDelta = priorityScore[b.priority] - priorityScore[a.priority];
-    if (energy === "low") return a.minutes - b.minutes || priorityDelta;
-    if (energy === "high") return priorityDelta || b.minutes - a.minutes;
-    return priorityDelta || a.minutes - b.minutes;
+    item.querySelector("input").addEventListener("change", (event) => {
+      state.tasks[index].done = event.target.checked;
+      saveState();
+      renderProgress();
+      item.classList.toggle("done", event.target.checked);
+    });
+    taskList.appendChild(item);
   });
 
-  return sorted;
+  renderProgress();
+  resetTimer();
 }
 
-function generateRecommendedPlan() {
-  const activeTasks = state.tasks.filter((task) => !task.done);
-  const ordered = recommendOrder(activeTasks, energyLevel.value);
+function renderProgress() {
+  const completed = state.tasks.filter((task) => task.done).length;
+  const percent = state.tasks.length ? Math.round((completed / state.tasks.length) * 100) : 0;
+  completionScore.textContent = `${percent}%`;
 
-  planList.innerHTML = ordered
-    .map((task, index) => {
-      const breakText = index > 0 && index % 2 === 0 ? " 完成后休息 5 分钟。" : "";
-      return `<li><strong>${escapeHtml(task.title)}</strong>：${task.minutes} 分钟，${priorityLabels[task.priority]}。${breakText}</li>`;
-    })
-    .join("");
-
-  showToast(ordered.length ? "已生成今日冲刺顺序" : "请先添加任务");
+  const days = Math.max(1, Math.min(7, Number(state.daysLeft)));
+  progressBars.innerHTML = "";
+  for (let day = 1; day <= days; day += 1) {
+    const planned = Math.min(100, Math.round((percent * day) / days + (day - 1) * 8));
+    const row = document.createElement("div");
+    row.className = "progress-row";
+    row.innerHTML = `
+      <span>Day ${day}</span>
+      <span class="bar-track"><span class="bar-fill" style="width: ${planned}%"></span></span>
+      <span>${planned}%</span>
+    `;
+    progressBars.appendChild(row);
+  }
 }
 
-function toggleTask(id) {
-  state.tasks = state.tasks.map((task) =>
-    task.id === id ? { ...task, done: !task.done } : task,
-  );
-  render();
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
 }
 
-function deleteTask(id) {
-  state.tasks = state.tasks.filter((task) => task.id !== id);
-  render();
-  showToast("任务已删除");
+function updateTimerDisplay() {
+  timerDisplay.textContent = formatTime(timer.remaining);
+  const elapsed = timer.total - timer.remaining;
+  const progress = timer.total ? Math.round((elapsed / timer.total) * 100) : 0;
+  timerFace.style.setProperty("--timer-progress", `${progress}%`);
+}
+
+function startTimer() {
+  if (timer.running) return;
+  timer.running = true;
+  timerMode.textContent = "Running";
+  timer.intervalId = window.setInterval(() => {
+    timer.remaining -= 1;
+    updateTimerDisplay();
+    if (timer.remaining <= 0) {
+      pauseTimer();
+      timerMode.textContent = "Done";
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  window.clearInterval(timer.intervalId);
+  timer.running = false;
+  timerMode.textContent = timer.remaining === timer.total ? "Ready" : "Paused";
+}
+
+function resetTimer() {
+  pauseTimer();
+  timer.total = Number(state.sessionLength) * 60;
+  timer.remaining = timer.total;
+  timerMode.textContent = "Ready";
+  updateTimerDisplay();
 }
 
 function escapeHtml(value) {
@@ -250,142 +224,34 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
-  window.clearTimeout(showToast.timeoutId);
-  showToast.timeoutId = window.setTimeout(() => toast.classList.remove("show"), 1800);
-}
-
-function setPreset(minutes) {
-  timer.duration = minutes * 60;
-  timer.remaining = timer.duration;
-  timer.running = false;
-  window.clearInterval(timer.intervalId);
-  presetButtons.forEach((button) => {
-    button.classList.toggle("selected", Number(button.dataset.minutes) === minutes);
-  });
-  updateTimerDisplay();
-}
-
-function updateTimerDisplay() {
-  const minutes = Math.floor(timer.remaining / 60);
-  const seconds = timer.remaining % 60;
-  timerTime.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-
-  const circumference = 2 * Math.PI * 52;
-  const progress = timer.remaining / timer.duration;
-  timerProgress.style.strokeDashoffset = String(circumference * (1 - progress));
-}
-
-function tickTimer() {
-  if (timer.remaining <= 0) {
-    window.clearInterval(timer.intervalId);
-    timer.running = false;
-    state.sessions += 1;
-    saveState();
-    renderInsights();
-    showToast("专注轮次完成，休息一下");
-    timer.remaining = timer.duration;
-    updateTimerDisplay();
-    return;
-  }
-
-  timer.remaining -= 1;
-  updateTimerDisplay();
-}
-
-function exportPlan() {
-  const activeTasks = recommendOrder(
-    state.tasks.filter((task) => !task.done),
-    energyLevel.value,
-  );
-
-  const lines = [
-    "# StudySprint AI 今日计划",
-    "",
-    `生成时间：${new Date().toLocaleString("zh-CN")}`,
-    "",
-    ...activeTasks.map(
-      (task, index) =>
-        `${index + 1}. ${task.title} - ${task.minutes} 分钟 - ${priorityLabels[task.priority]} - ${typeLabels[task.type]}`,
-    ),
-  ];
-
-  navigator.clipboard
-    .writeText(lines.join("\n"))
-    .then(() => showToast("计划已复制到剪贴板"))
-    .catch(() => showToast("浏览器不允许复制，请手动查看计划"));
-}
-
-function seedDemoData() {
-  state.tasks = [
-    createTask({ title: "完成 Vibe Coding 项目 README", minutes: 35, priority: "high", type: "writing" }),
-    createTask({ title: "录制 3 分钟功能演示流程", minutes: 25, priority: "high", type: "review" }),
-    createTask({ title: "复习 JavaScript DOM 操作", minutes: 45, priority: "medium", type: "coding" }),
-    createTask({ title: "整理韩语课堂笔记", minutes: 30, priority: "medium", type: "reading" }),
-    createTask({ title: "背诵项目介绍中文稿", minutes: 20, priority: "low", type: "memory" }),
-  ];
-  state.sessions = Math.max(state.sessions, 2);
-  render();
-  generateRecommendedPlan();
-  showToast("演示数据已载入");
-}
-
-taskForm.addEventListener("submit", (event) => {
+form.addEventListener("submit", (event) => {
   event.preventDefault();
-  state.tasks.push(
-    createTask({
-      title: taskTitle.value.trim(),
-      minutes: taskMinutes.value,
-      priority: taskPriority.value,
-      type: taskType.value,
-    }),
-  );
-  taskForm.reset();
-  taskMinutes.value = 30;
-  taskPriority.value = "medium";
-  taskType.value = "coding";
+  state = {
+    ...state,
+    topic: topicInput.value.trim(),
+    goal: goalInput.value.trim(),
+    daysLeft: Number(daysInput.value),
+    sessionLength: Number(sessionInput.value),
+    energy: energyInput.value,
+  };
+  state.tasks = generateTasks(state);
+  saveState();
   render();
-  showToast("任务已添加");
 });
 
-energyLevel.addEventListener("change", () => {
-  renderCoach();
-  generateRecommendedPlan();
-});
-
-generatePlan.addEventListener("click", generateRecommendedPlan);
-exportButton.addEventListener("click", exportPlan);
-seedDemoButton.addEventListener("click", seedDemoData);
-
-clearDoneButton.addEventListener("click", () => {
-  state.tasks = state.tasks.filter((task) => !task.done);
+resetTasksButton.addEventListener("click", () => {
+  state.tasks = generateTasks(state);
+  saveState();
   render();
-  showToast("已清理完成任务");
 });
 
-startTimer.addEventListener("click", () => {
-  if (timer.running) return;
-  timer.running = true;
-  timer.intervalId = window.setInterval(tickTimer, 1000);
+notesInput.addEventListener("input", () => {
+  state.notes = notesInput.value;
+  saveState();
 });
 
-pauseTimer.addEventListener("click", () => {
-  timer.running = false;
-  window.clearInterval(timer.intervalId);
-});
-
-resetTimer.addEventListener("click", () => {
-  timer.running = false;
-  window.clearInterval(timer.intervalId);
-  timer.remaining = timer.duration;
-  updateTimerDisplay();
-});
-
-presetButtons.forEach((button) => {
-  button.addEventListener("click", () => setPreset(Number(button.dataset.minutes)));
-});
+startTimerButton.addEventListener("click", startTimer);
+pauseTimerButton.addEventListener("click", pauseTimer);
+resetTimerButton.addEventListener("click", resetTimer);
 
 render();
-updateTimerDisplay();
